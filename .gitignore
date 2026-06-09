@@ -1,0 +1,16 @@
+# Large video files - too big for GitHub
+uploads/*.mp4
+uploads/*.mov
+uploads/*.avi
+uploads/*.mkv
+
+# Node modules
+node_modules/
+
+# Environment files
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db

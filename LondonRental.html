@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LondonRental.ca — Rentals Made Simple</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --navy-900:#060F1C; --navy-800:#081624; --navy-700:#091520;
+  --navy-600:#0B1F3A; --navy-500:#0C1E38; --navy-400:#112847; --navy-300:#0D2545;
+  --gold-600:#B07E1E; --gold-500:#C9922A; --gold-400:#E5B45A;
+  --silver-500:#8A9AB5; --silver-400:#A9B6CC; --silver-300:#EEF1F6;
+  --white:#fff; --off-white:#F5F2EC;
+  --green-300:#4ADE80; --green-500:#1A7A4A; --red-300:#FC8181;
+  --type-house:#C9922A; --type-apartment:#5B8DEE; --type-condo:#9B59B6; --type-townhome:#1ABC9C;
+
+  --text-secondary:rgba(255,255,255,.66); --text-tertiary:rgba(255,255,255,.46);
+  --hairline:rgba(255,255,255,.08); --soft:rgba(255,255,255,.13);
+  --glass:rgba(255,255,255,.04); --glass-hover:rgba(255,255,255,.065);
+  --gold-wash:rgba(201,146,42,.06);
+
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-sans:'DM Sans',system-ui,sans-serif;
+  --grad-gold:linear-gradient(135deg,var(--gold-400),var(--gold-500));
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --maxw:1240px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-sans);
+  background:var(--navy-900);
+  color:var(--white);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  line-height:1.6;
+}
+::selection{background:var(--gold-500);color:var(--navy-900)}
+
+.playfair{font-family:var(--font-display)}
+.eyebrow{
+  font-size:11px;text-transform:uppercase;letter-spacing:.28em;
+  color:var(--gold-500);font-weight:600;
+}
+.section{position:relative;z-index:2;
+  background:
+    radial-gradient(135% 80% at 50% 0%, rgba(17,40,71,.40), transparent 52%),
+    var(--navy-600);
+}
+.section > .wrap{position:relative;z-index:1}
+/* faint architectural blueprint grid utility */
+.grid-tex::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(201,146,42,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,146,42,.035) 1px, transparent 1px);
+  background-size:68px 68px;
+  -webkit-mask-image:radial-gradient(120% 80% at 50% 40%, #000 30%, transparent 78%);
+  mask-image:radial-gradient(120% 80% at 50% 40%, #000 30%, transparent 78%);
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+h2.title{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(34px,5vw,58px);line-height:1.05;letter-spacing:-.01em;
+  text-wrap:balance;
+}
+.lead{font-size:clamp(16px,1.5vw,19px);color:var(--text-secondary);line-height:1.75;max-width:60ch;text-wrap:pretty}
+.gold-text{color:var(--gold-400)}
+
+/* ---------- Realistic skyline hero media ---------- */
+#hero-media{position:absolute;inset:0;z-index:0;overflow:hidden;background:#060F1C}
+.hm-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center 42%;
+  transform:scale(1.05);
+  filter:saturate(.92) contrast(1.04) brightness(.9);
+  animation:kenburns 34s ease-in-out infinite alternate;will-change:transform;
+}
+@keyframes kenburns{
+  0%{transform:scale(1.05) translate3d(0,0,0)}
+  100%{transform:scale(1.17) translate3d(-2%,-1.6%,0)}
+}
+/* navy multiply grade + warm gold bloom — makes any photo read brand-navy+gold */
+.hm-grade{position:absolute;inset:0;mix-blend-mode:multiply;
+  background:
+    linear-gradient(180deg, rgba(9,20,40,.42) 0%, rgba(8,16,32,.62) 55%, rgba(6,15,28,.96) 100%),
+    radial-gradient(120% 90% at 50% 18%, rgba(28,52,96,.30), transparent 60%);
+}
+.hm-bloom{position:absolute;inset:0;mix-blend-mode:screen;
+  background:
+    radial-gradient(60% 50% at 50% 78%, rgba(201,146,42,.20), transparent 62%),
+    radial-gradient(40% 40% at 22% 38%, rgba(229,180,90,.10), transparent 60%);
+}
+#canvas-veil{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(120% 80% at 50% 122%, rgba(201,146,42,.12), transparent 58%),
+    linear-gradient(180deg, rgba(6,15,28,.42) 0%, transparent 20%, transparent 50%, rgba(6,15,28,.92) 100%);
+}
+
+/* ---------- Nav ---------- */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 40px;transition:background .4s var(--ease-out),padding .4s var(--ease-out),border-color .4s;
+  border-bottom:1px solid transparent;
+}
+nav.scrolled{
+  background:rgba(8,18,32,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  padding:14px 40px;border-bottom:1px solid var(--hairline);
+}
+nav .brand img{height:42px;display:block;transition:height .4s var(--ease-out)}
+nav.scrolled .brand img{height:34px}
+.nav-links{display:flex;align-items:center;gap:38px}
+.nav-links a{
+  color:var(--text-secondary);text-decoration:none;font-size:14px;font-weight:500;
+  letter-spacing:.01em;transition:color .25s;position:relative;
+}
+.nav-links a:not(.btn):hover{color:var(--white)}
+.nav-links a:not(.btn)::after{
+  content:'';position:absolute;left:0;bottom:-6px;width:0;height:1.5px;background:var(--gold-500);
+  transition:width .3s var(--ease-out);
+}
+.nav-links a:not(.btn):hover::after{width:100%}
+.nav-toggle{display:none;flex-direction:column;gap:5px;width:44px;height:44px;align-items:center;justify-content:center;
+  background:rgba(8,18,32,.5);border:1px solid var(--soft);border-radius:9px;cursor:pointer;padding:0;z-index:62}
+.nav-toggle span{display:block;width:20px;height:2px;background:var(--white);border-radius:2px;transition:transform .3s var(--ease-out),opacity .25s}
+.nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.nav-backdrop{position:fixed;inset:0;background:rgba(4,10,20,.55);opacity:0;visibility:hidden;transition:opacity .4s var(--ease-out);z-index:55}
+.nav-backdrop.open{opacity:1;visibility:visible}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:9px;cursor:pointer;border:none;
+  font-family:var(--font-sans);font-weight:600;font-size:14px;letter-spacing:.03em;
+  padding:14px 26px;border-radius:4px;text-decoration:none;transition:all .3s var(--ease-out);
+  white-space:nowrap;
+}
+.btn-gold{background:var(--grad-gold);color:var(--navy-900);box-shadow:0 6px 22px rgba(201,146,42,.22)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(201,146,42,.42)}
+.btn-outline{background:transparent;border:1.5px solid var(--gold-500);color:var(--gold-400)}
+.btn-outline:hover{background:var(--grad-gold);color:var(--navy-900);transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--soft);color:var(--white)}
+.btn-ghost:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+.btn .arr{transition:transform .3s var(--ease-out)}
+.btn:hover .arr{transform:translateX(4px)}
+
+/* ---------- Hero ---------- */
+.hero-scene{position:relative;min-height:100vh;z-index:2;overflow:hidden}
+.hero-sticky{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;padding:120px 0 90px}
+.hero-inner{position:relative;z-index:3;width:100%;max-width:var(--maxw);margin:0 auto;padding:0 40px}
+.hero-eyebrow{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.hero-eyebrow .eyebrow{white-space:nowrap}
+.hero-eyebrow .line{width:46px;height:1px;background:linear-gradient(90deg,var(--gold-500),transparent)}
+.hero h1{
+  font-family:var(--font-display);font-weight:800;
+  font-size:clamp(48px,9vw,116px);line-height:.98;letter-spacing:-.02em;
+  text-wrap:balance;
+}
+.hero h1 .it{font-style:italic;font-weight:500;color:var(--gold-400)}
+.hero .sub{margin-top:30px;max-width:50ch;font-size:clamp(16px,1.6vw,20px);color:var(--text-secondary);line-height:1.7}
+.hero .cta-row{display:flex;gap:16px;margin-top:42px;flex-wrap:wrap}
+.scroll-cue{
+  position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--text-tertiary);
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+}
+.scroll-cue .mouse{width:22px;height:36px;border:1.5px solid var(--soft);border-radius:12px;position:relative}
+.scroll-cue .mouse::after{
+  content:'';position:absolute;top:7px;left:50%;width:3px;height:7px;background:var(--gold-400);
+  border-radius:2px;transform:translateX(-50%);animation:scrollDot 1.8s var(--ease-out) infinite;
+}
+@keyframes scrollDot{0%{opacity:0;transform:translate(-50%,0)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,12px)}}
+
+/* ---------- Stat band ---------- */
+.stat-band{
+  position:relative;z-index:2;background:linear-gradient(180deg,var(--navy-700),var(--navy-600));
+  border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);
+}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat{padding:54px 30px;text-align:center;border-right:1px solid var(--hairline)}
+.stat:last-child{border-right:none}
+.stat .num{font-family:var(--font-display);font-weight:800;font-size:clamp(40px,5vw,62px);color:var(--gold-400);line-height:1}
+.stat .lbl{margin-top:12px;font-size:13px;color:var(--text-tertiary);letter-spacing:.04em;text-transform:uppercase}
+
+/* ---------- Generic section spacing ---------- */
+.pad{padding:130px 0}
+/* tighten the gap between What's Included and Available Rentals */
+.services{padding-bottom:66px}
+#listings{padding-top:70px}
+#landlords{background:
+  radial-gradient(46% 56% at 92% 6%, rgba(201,146,42,.07), transparent 58%),
+  radial-gradient(48% 54% at 2% 92%, rgba(28,52,96,.30), transparent 60%),
+  var(--navy-600);
+}
+.sec-head{max-width:680px;margin-bottom:64px}
+.sec-head .eyebrow{margin-bottom:18px;display:block}
+.sec-head .lead{margin-top:22px}
+
+/* ---------- Landlord / split ---------- */
+.split{display:grid;grid-template-columns:1.05fr .95fr;gap:80px;align-items:center}
+.control-list{margin-top:36px;display:flex;flex-direction:column;gap:2px}
+.control-item{display:flex;gap:20px;padding:22px 0;border-top:1px solid var(--hairline)}
+.control-item:last-child{border-bottom:1px solid var(--hairline)}
+.control-item .ic{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--gold-wash);border:1px solid var(--soft);color:var(--gold-400)}
+.control-item h4{font-size:17px;font-weight:600;margin-bottom:5px}
+.control-item p{font-size:14.5px;color:var(--text-secondary)}
+.split-visual{
+  position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/5;
+  border:1px solid var(--soft);
+  background:linear-gradient(160deg,var(--navy-400),var(--navy-700));
+}
+.split-visual img{width:100%;height:100%;object-fit:cover;opacity:.92}
+.split-visual .scrim{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(6,15,28,.9))}
+.split-visual .badge-float{
+  position:absolute;left:24px;bottom:24px;right:24px;
+  background:rgba(8,18,32,.72);backdrop-filter:blur(14px);border:1px solid var(--soft);
+  border-radius:12px;padding:20px 22px;
+}
+.split-visual .badge-float .k{font-family:var(--font-display);font-size:30px;color:var(--gold-400);font-weight:700}
+.split-visual .badge-float .v{font-size:13px;color:var(--text-secondary);margin-top:3px}
+
+/* ---------- Services ---------- */
+.services{background:linear-gradient(180deg,var(--navy-600),var(--navy-700))}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.svc-card{
+  background:var(--glass);border:1px solid var(--hairline);border-radius:14px;padding:34px 30px;
+  transition:transform .4s var(--ease-out),border-color .4s,background .4s,box-shadow .4s;
+}
+.svc-card:hover{transform:translateY(-6px);border-color:var(--border-gold,rgba(201,146,42,.3));background:var(--glass-hover);box-shadow:0 24px 54px rgba(0,0,0,.4)}
+.svc-card .ic{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:var(--gold-wash);border:1px solid var(--soft);color:var(--gold-400);margin-bottom:24px}
+.svc-card h4{font-size:19px;font-weight:600;margin-bottom:10px;font-family:var(--font-display)}
+.svc-card p{font-size:14.5px;color:var(--text-secondary)}
+
+/* ---------- Fees ---------- */
+.fees{background:radial-gradient(120% 120% at 80% 0%,rgba(201,146,42,.07),transparent 55%),var(--navy-800)}
+.fee-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:70px;align-items:center}
+.fee-big{font-family:var(--font-display);font-weight:900;font-size:clamp(120px,18vw,230px);line-height:.82;color:var(--gold-400);letter-spacing:-.03em}
+.fee-big small{font-size:.28em;color:var(--text-secondary);font-family:var(--font-sans);font-weight:500;display:block;letter-spacing:.02em;margin-top:14px;line-height:1.5}
+.fee-example{background:var(--gold-wash);border:1px solid rgba(201,146,42,.3);border-radius:14px;padding:38px}
+.fee-example h4{font-family:var(--font-display);font-size:23px;margin-bottom:22px}
+.fee-row{display:flex;justify-content:space-between;align-items:baseline;padding:16px 0;border-bottom:1px solid var(--hairline);font-size:15px}
+.fee-row:last-of-type{border-bottom:none}
+.fee-row .v{font-family:var(--font-display);font-weight:700;font-size:22px;color:var(--white)}
+.fee-row.total .v{color:var(--gold-400);font-size:30px}
+.fee-note{margin-top:18px;font-size:13.5px;color:var(--text-tertiary);font-style:italic}
+
+/* ---------- Listings ---------- */
+.listings{background:linear-gradient(180deg,var(--navy-700),var(--navy-600))}
+.filter-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:42px}
+.chip{
+  padding:10px 20px;border-radius:22px;font-size:13.5px;font-weight:500;cursor:pointer;
+  background:var(--glass);border:1px solid var(--soft);color:var(--text-secondary);
+  transition:all .25s var(--ease-out);
+}
+.chip:hover{color:var(--white);border-color:var(--gold-500)}
+.chip.active{background:var(--grad-gold);color:var(--navy-900);border-color:transparent;font-weight:600}
+.list-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.listing{
+  background:var(--glass);border:1px solid var(--hairline);border-radius:14px;overflow:hidden;
+  transition:transform .4s var(--ease-out),border-color .4s,box-shadow .4s;display:flex;flex-direction:column;
+}
+.listing:hover{transform:translateY(-6px);border-color:rgba(201,146,42,.3);box-shadow:0 26px 56px rgba(0,0,0,.45)}
+.listing .ph{position:relative;aspect-ratio:3/2;overflow:hidden;background:linear-gradient(150deg,var(--navy-400),var(--navy-700))}
+.listing .ph img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease-out)}
+.listing:hover .ph img{transform:scale(1.06)}
+.listing .ph .scrim{position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(6,15,28,.55))}
+.type-pill{
+  position:absolute;top:14px;left:14px;display:flex;align-items:center;gap:7px;
+  background:rgba(8,18,32,.78);backdrop-filter:blur(8px);border:1px solid var(--soft);
+  padding:6px 13px;border-radius:20px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:600;
+}
+.type-pill .dot{width:7px;height:7px;border-radius:50%}
+.status-pill{
+  position:absolute;top:14px;right:14px;padding:6px 13px;border-radius:20px;font-size:11px;
+  text-transform:uppercase;letter-spacing:.08em;font-weight:600;
+  background:rgba(26,122,74,.18);color:var(--green-300);border:1px solid rgba(74,222,128,.3);
+}
+.status-pill.rented{background:rgba(192,57,43,.18);color:var(--red-300);border-color:rgba(252,129,129,.3)}
+.listing .body{padding:22px 22px 24px;flex:1;display:flex;flex-direction:column}
+.listing .price{font-family:var(--font-display);font-weight:700;font-size:28px;color:var(--gold-400);line-height:1}
+.listing .price span{font-size:14px;color:var(--text-tertiary);font-family:var(--font-sans);font-weight:400}
+.listing h4{font-size:17px;font-weight:600;margin:10px 0 4px}
+.listing .addr{font-size:13.5px;color:var(--text-tertiary);display:flex;align-items:center;gap:6px}
+.listing .meta{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:16px;padding-top:16px;border-top:1px solid var(--hairline);font-size:12.5px;color:var(--text-secondary)}
+.listing .meta span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.listing .meta svg{color:var(--gold-500);flex:none}
+
+/* ---------- About ---------- */
+.about{background:var(--navy-800);position:relative;overflow:hidden}
+.about::before{content:'';position:absolute;inset:0;background:radial-gradient(80% 90% at 15% 50%,rgba(201,146,42,.06),transparent 60%)}
+.about .wrap{position:relative}
+.about-grid{display:grid;grid-template-columns:.46fr .54fr;gap:76px;align-items:center}
+.kunal-photo{
+  position:relative;border-radius:16px;overflow:hidden;aspect-ratio:4/5;
+  border:1px solid var(--soft);box-shadow:0 30px 70px rgba(0,0,0,.5);
+}
+.kunal-photo img{width:100%;height:100%;object-fit:cover;object-position:center 22%;
+  filter:saturate(.96) contrast(1.02);transition:transform .9s var(--ease-out)}
+.kunal-photo:hover img{transform:scale(1.04)}
+.kp-scrim{position:absolute;inset:0;background:
+  linear-gradient(180deg,rgba(6,15,28,.18) 0%,transparent 32%,transparent 52%,rgba(6,15,28,.92) 100%)}
+.kp-badge{position:absolute;top:20px;left:20px;display:flex;align-items:center;gap:12px;
+  background:rgba(8,18,32,.66);backdrop-filter:blur(12px);border:1px solid var(--border-gold-strong,rgba(201,146,42,.3));
+  border-radius:12px;padding:12px 16px}
+.kp-badge .k{font-family:var(--font-display);font-weight:800;font-size:32px;color:var(--gold-400);line-height:1}
+.kp-badge .v{font-size:11px;color:var(--text-secondary);line-height:1.35;letter-spacing:.02em}
+.kp-name{position:absolute;left:26px;right:26px;bottom:24px}
+.kp-name .name{font-family:var(--font-display);font-size:26px;font-weight:700;color:#fff}
+.kp-name .role{font-size:12px;color:var(--gold-400);text-transform:uppercase;letter-spacing:.16em;margin-top:7px}
+.about-sign{margin-top:34px;padding-top:24px;border-top:1px solid var(--hairline)}
+.about-sign .sig{font-family:var(--font-display);font-style:italic;font-size:26px;color:var(--gold-400);display:block}
+.about-sign .sig-sub{font-size:12px;color:var(--text-tertiary);letter-spacing:.04em;margin-top:6px;display:block}
+.about blockquote{
+  font-family:var(--font-display);font-size:clamp(22px,2.5vw,32px);line-height:1.35;font-weight:500;
+  font-style:italic;text-wrap:pretty;
+}
+.about blockquote{margin-bottom:0}
+.about blockquote .mark{color:var(--gold-400)}
+.about .by{margin-top:30px;font-size:14px;color:var(--text-secondary);line-height:1.75}
+
+/* ---------- CTA ---------- */
+.cta{
+  background:linear-gradient(135deg,var(--navy-600),var(--navy-800));
+  border-top:1px solid var(--hairline);text-align:center;position:relative;overflow:hidden;
+}
+.cta::after{content:'';position:absolute;inset:0;background:radial-gradient(60% 120% at 50% 0%,rgba(201,146,42,.1),transparent 60%);pointer-events:none}
+.cta .wrap{position:relative;z-index:2}
+.cta h2{font-family:var(--font-display);font-weight:800;font-size:clamp(36px,5.5vw,68px);line-height:1.04;letter-spacing:-.02em;text-wrap:balance}
+.cta .lead{margin:24px auto 40px}
+.cta .cta-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- Footer ---------- */
+footer{background:var(--navy-900);position:relative;z-index:2;padding:70px 0 40px;border-top:1px solid var(--hairline)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:50px;margin-bottom:50px}
+footer .flogo{height:44px;margin-bottom:22px}
+footer .fdesc{font-size:14px;color:var(--text-tertiary);max-width:34ch}
+footer h5{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--gold-400);margin-bottom:20px;font-weight:600}
+footer ul{list-style:none}
+footer li{margin-bottom:13px}
+footer a{color:var(--text-secondary);text-decoration:none;font-size:14px;transition:color .25s}
+footer a:hover{color:var(--gold-400)}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:30px;border-top:1px solid var(--hairline);font-size:13px;color:var(--text-tertiary);flex-wrap:wrap;gap:12px}
+.foot-end{display:inline-flex;align-items:center;gap:12px}
+.admin-dot{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;cursor:pointer;
+  background:transparent;border:1px solid var(--hairline);color:var(--text-tertiary);opacity:.45;transition:all .25s var(--ease-out)}
+.admin-dot:hover{opacity:1;color:var(--gold-400);border-color:var(--gold-500)}
+
+/* ---------- reveal (only hides when JS adds .anim to <html>) ---------- */
+.reveal{transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}
+html.anim .reveal{opacity:0;transform:translateY(34px)}
+html.anim .reveal.in{opacity:1;transform:none}
+
+/* ---------- Responsive ---------- */
+@media(max-width:980px){
+  .split,.fee-grid,.about-grid{grid-template-columns:1fr;gap:46px}
+  .svc-grid,.list-grid{grid-template-columns:repeat(2,1fr)}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .stat:nth-child(2){border-right:none}
+  .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--hairline)}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:36px}
+}
+/* ---- mobile nav drawer ---- */
+@media(max-width:840px){
+  .nav-toggle{display:flex}
+  .nav-links{
+    position:fixed;top:0;right:0;height:100dvh;width:min(82vw,310px);
+    flex-direction:column;align-items:stretch;justify-content:flex-start;gap:4px;
+    background:rgba(8,18,32,.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    padding:92px 26px 28px;border-left:1px solid var(--hairline);
+    transform:translateX(100%);transition:transform .4s var(--ease-out);z-index:58;
+  }
+  .nav-links.open{transform:none;box-shadow:-30px 0 90px rgba(0,0,0,.55)}
+  .nav-links a{font-size:16px;width:100%;padding:14px 4px;border-bottom:1px solid var(--hairline)}
+  .nav-links a:not(.btn)::after{display:none}
+  .nav-links a.btn{margin-top:18px;justify-content:center;padding:15px 26px;border-bottom:none}
+}
+@media(max-width:680px){
+  .wrap{padding:0 20px}
+  nav{padding:15px 20px}
+  nav.scrolled{padding:11px 20px}
+  .svc-grid,.list-grid{grid-template-columns:1fr}
+  .pad{padding:84px 0}
+  .hero-sticky{padding:110px 0 84px}
+  .hero h1{font-size:clamp(44px,15vw,68px)}
+  .stat-grid{grid-template-columns:1fr}
+  .stat{border-right:none;border-bottom:1px solid var(--hairline);padding:34px 20px}
+  .stat:last-child{border-bottom:none}
+  .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--hairline)}
+  .sec-head{margin-bottom:42px}
+  .control-item{gap:15px}
+  .cta-row .btn,.hero .cta-row .btn{flex:1;justify-content:center}
+  .about blockquote{font-size:22px}
+  footer .foot-grid{grid-template-columns:1fr;gap:30px}
+}
+@media(max-width:400px){
+  .hero .cta-row{flex-direction:column}
+  .hero .cta-row .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1!important;transform:none!important;transition:none!important}
+  .hm-bg{animation:none!important}
+  *{scroll-behavior:auto}
+}
+
+/* ============ Listing inquire button ============ */
+.listing-cta{width:100%;justify-content:center;margin-top:0;font-size:13px;padding:11px 16px}
+.listing-cta:disabled{cursor:default;opacity:.6}
+.listing-cta:disabled:hover{transform:none;background:rgba(255,255,255,.06)}
+.ldesc{font-size:13px;color:var(--text-secondary);line-height:1.6;margin:12px 0 2px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.listing-acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.listing{cursor:pointer}
+
+/* ============ Listing detail modal ============ */
+.lr-d-hero{position:relative;flex:none;height:260px;overflow:hidden;background:linear-gradient(150deg,var(--navy-400),var(--navy-700))}
+.lr-d-hero img{width:100%;height:100%;object-fit:cover}
+.lr-d-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,15,28,.15) 0%,transparent 38%,rgba(6,15,28,.85) 100%)}
+.lr-d-pills{position:absolute;top:16px;left:16px;display:flex;gap:8px;z-index:2}
+.lr-d-type,.lr-d-status{display:inline-flex;align-items:center;gap:7px;background:rgba(8,18,32,.8);backdrop-filter:blur(8px);
+  border:1px solid var(--soft);padding:6px 13px;border-radius:20px;font-size:11px;text-transform:uppercase;letter-spacing:.09em;font-weight:600}
+.lr-d-type .dot{width:7px;height:7px;border-radius:50%}
+.lr-d-status{background:rgba(26,122,74,.85);color:#fff;border-color:transparent}
+.lr-d-status.rented{background:rgba(192,57,43,.85)}
+.lr-d-price{position:absolute;left:22px;bottom:18px;z-index:2;font-family:var(--font-display);font-weight:700;font-size:34px;color:#fff}
+.lr-d-price span{font-size:15px;color:var(--text-secondary);font-family:var(--font-sans);font-weight:400}
+.lr-d-title{font-family:var(--font-display);font-size:25px;font-weight:700;line-height:1.15;margin-bottom:8px}
+.lr-d-addr{display:flex;align-items:center;gap:8px;color:var(--text-tertiary);font-size:14px;margin-bottom:18px}
+.lr-d-addr svg{color:var(--gold-500);flex:none}
+.lr-d-chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:6px}
+.lr-d-chip{display:inline-flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--hairline);
+  border-radius:10px;padding:9px 14px;font-size:13.5px;color:var(--text-secondary)}
+.lr-d-chip svg{color:var(--gold-500)}
+.lr-d-sec{margin-top:24px}
+.lr-d-desc{font-size:14.5px;color:var(--text-secondary);line-height:1.8;text-wrap:pretty}
+.lr-map-wrap{border-radius:10px;overflow:hidden;border:1px solid var(--soft);background:var(--navy-700)}
+.lr-map{width:100%;height:260px;border:0;display:block;filter:grayscale(.2) contrast(1.05)}
+.lr-map-link{display:inline-block;margin-top:12px;color:var(--gold-400);font-size:13px;font-weight:600;text-decoration:none}
+.lr-map-link:hover{text-decoration:underline}
+
+/* ============ Modal / Dialog ============ */
+.lr-scrim{
+  position:fixed;inset:0;z-index:120;display:none;
+  background:rgba(5,15,30,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  overflow-y:auto;padding:34px 20px;
+}
+.lr-scrim.open{display:flex;align-items:center;justify-content:center;animation:lrScrim .25s var(--ease-out)}
+@keyframes lrScrim{from{opacity:0}to{opacity:1}}
+.lr-dialog{
+  position:relative;width:100%;max-width:620px;margin:auto;
+  background:linear-gradient(170deg,var(--navy-400),var(--navy-700));
+  border:1px solid var(--soft);border-radius:14px;overflow:hidden;
+  box-shadow:0 40px 110px rgba(0,0,0,.6);animation:lrPop .35s var(--ease-out);
+  max-height:calc(100vh - 48px);display:flex;flex-direction:column;
+}
+.lr-dialog.wide{max-width:660px}
+@keyframes lrPop{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:none}}
+.lr-dialog::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad-gold);z-index:3}
+.lr-head{padding:30px 34px 0;position:relative;flex:none}
+.lr-head .eyebrow{display:block;margin-bottom:12px}
+.lr-head h3{font-family:var(--font-display);font-weight:700;font-size:26px;line-height:1.12;letter-spacing:-.01em;padding-right:40px}
+.lr-close{
+  position:absolute;top:22px;right:22px;width:38px;height:38px;border-radius:50%;cursor:pointer;z-index:5;
+  display:grid;place-items:center;background:rgba(8,18,32,.7);border:1px solid var(--soft);
+  color:var(--text-secondary);transition:all .25s var(--ease-out);
+}
+.lr-close:hover{background:rgba(255,255,255,.12);color:var(--white);border-color:var(--gold-500);transform:rotate(90deg)}
+.lr-body{padding:26px 34px 34px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.lr-step{animation:lrFade .35s var(--ease-out)}
+@keyframes lrFade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* Step indicator */
+.lr-steps{display:flex;align-items:center;margin:22px 0 30px}
+.lr-steps .st{display:flex;flex-direction:column;align-items:center;gap:8px;flex:none;width:46px}
+.lr-steps .dot{
+  width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  font-size:13px;font-weight:700;background:var(--glass);border:1px solid var(--soft);color:var(--text-tertiary);
+  transition:all .3s var(--ease-out);
+}
+.lr-steps .st.active .dot{background:var(--grad-gold);border-color:transparent;color:var(--navy-900)}
+.lr-steps .st.done .dot{background:rgba(26,122,74,.2);border-color:rgba(74,222,128,.4);color:var(--green-300)}
+.lr-steps .st .lbl{font-size:10px;text-align:center;color:var(--text-tertiary);letter-spacing:.02em;line-height:1.25;width:78px}
+.lr-steps .st.active .lbl{color:var(--gold-400)}
+.lr-steps .bar{flex:1;height:1.5px;background:var(--soft);margin:0 -16px;margin-bottom:24px;position:relative;z-index:0}
+.lr-steps .bar.filled{background:linear-gradient(90deg,var(--green-500),var(--gold-500))}
+
+.lr-lead{color:var(--text-secondary);line-height:1.75;font-size:15px;margin-bottom:22px}
+.lr-lead strong{color:var(--gold-400)}
+
+/* feature rows */
+.lr-feat{display:flex;gap:15px;padding:15px 18px;border-radius:10px;margin-bottom:13px;
+  background:var(--glass);border:1px solid var(--hairline)}
+.lr-feat.gold{background:var(--gold-wash);border-color:rgba(201,146,42,.28)}
+.lr-feat .fi{flex:none;width:38px;height:38px;border-radius:9px;display:grid;place-items:center;
+  background:var(--gold-wash);border:1px solid var(--soft);color:var(--gold-400)}
+.lr-feat h5{font-size:14.5px;font-weight:600;margin-bottom:3px}
+.lr-feat p{font-size:13px;color:var(--text-secondary);line-height:1.6}
+
+/* included grid */
+.lr-inc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.lr-inc .cell{background:var(--gold-wash);border:1px solid rgba(201,146,42,.24);border-radius:10px;padding:16px;
+  display:flex;flex-direction:column;gap:10px}
+.lr-inc .cell .fi{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;color:var(--gold-400);
+  background:rgba(201,146,42,.12);border:1px solid var(--soft)}
+.lr-inc .cell span{font-size:13.5px;font-weight:600}
+.lr-control-note{background:rgba(26,122,74,.12);border:1px solid rgba(74,222,128,.28);border-radius:10px;padding:16px 18px;margin-bottom:24px}
+.lr-control-note h5{color:var(--green-300);font-size:14.5px;margin-bottom:5px}
+.lr-control-note p{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* fee callout */
+.lr-fee{text-align:center;padding:6px 0 24px}
+.lr-fee .big{font-family:var(--font-display);font-weight:900;font-size:72px;line-height:1;color:var(--gold-400)}
+.lr-fee .s1{font-size:17px;color:var(--text-secondary);margin-top:8px}
+.lr-fee .s2{font-size:13px;color:var(--text-tertiary);margin-top:3px}
+.lr-note{background:var(--gold-wash);border:1px solid rgba(201,146,42,.28);border-radius:10px;padding:15px 18px;
+  font-size:13.5px;color:var(--text-secondary);line-height:1.7;margin:8px 0 24px}
+.lr-note strong{color:var(--gold-400)}
+
+/* form fields */
+.lr-sub-label{font-size:12px;font-weight:600;color:var(--gold-400);letter-spacing:.08em;text-transform:uppercase;margin:6px 0 14px}
+.lr-field{margin-bottom:14px}
+.lr-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.lr-field label,.lr-grid2 label{display:block;font-size:11px;color:var(--text-tertiary);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:7px;font-weight:600}
+.lr-field input,.lr-field select,.lr-field textarea,
+.lr-grid2 input,.lr-grid2 select{
+  width:100%;background:rgba(255,255,255,.06);border:1px solid var(--soft);border-radius:6px;
+  color:var(--white);font-family:var(--font-sans);font-size:14px;padding:11px 13px;transition:border-color .25s,box-shadow .25s;
+}
+.lr-field textarea{resize:vertical;min-height:84px;line-height:1.6}
+.lr-field input::placeholder,.lr-field textarea::placeholder,.lr-grid2 input::placeholder{color:var(--text-tertiary)}
+.lr-field input:focus,.lr-field select:focus,.lr-field textarea:focus,
+.lr-grid2 input:focus,.lr-grid2 select:focus{
+  outline:none;border-color:var(--gold-500);box-shadow:0 0 0 3px rgba(201,146,42,.18)
+}
+.lr-field select,.lr-grid2 select{appearance:none;-webkit-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23C9922A' stroke-width='1.6'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
+.lr-field select option,.lr-grid2 select option{background:var(--navy-700);color:var(--white)}
+.lr-span2{grid-column:1/-1}
+
+/* chip row inside inquiry */
+.lr-chiprow{display:flex;gap:10px;margin-bottom:6px}
+.lr-chiprow .c{flex:1;text-align:center;padding:11px 8px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;
+  background:var(--glass);border:1px solid var(--soft);color:var(--text-secondary);transition:all .25s var(--ease-out)}
+.lr-chiprow .c.on{background:var(--grad-gold);color:var(--navy-900);border-color:transparent;font-weight:600}
+
+.lr-actions{display:flex;gap:12px;margin-top:8px}
+.lr-actions .btn{flex:1;justify-content:center}
+.lr-actions .btn.grow{flex:2}
+
+/* confirmation */
+.lr-done{text-align:center;padding:18px 0 8px}
+.lr-done .ring{width:74px;height:74px;border-radius:50%;margin:0 auto 22px;display:grid;place-items:center;
+  background:rgba(26,122,74,.16);border:1px solid rgba(74,222,128,.4);color:var(--green-300)}
+.lr-done h3{font-family:var(--font-display);font-size:25px;margin-bottom:12px}
+.lr-done p{color:var(--text-secondary);line-height:1.8;font-size:14.5px;margin-bottom:26px}
+.lr-done p strong{color:var(--gold-400)}
+
+@media(max-width:560px){
+  .lr-head{padding:26px 22px 0}
+  .lr-body{padding:22px 22px 28px}
+  .lr-grid2,.lr-inc{grid-template-columns:1fr}
+  .lr-head h3{font-size:22px}
+  .lr-steps .st .lbl{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .lr-scrim,.lr-dialog,.lr-step{animation:none!important}
+}
+
+/* ============ Photo upload (submit form) ============ */
+.lr-drop{border:1.5px dashed rgba(201,146,42,.45);border-radius:10px;padding:22px;text-align:center;cursor:pointer;
+  color:var(--text-tertiary);transition:all .25s var(--ease-out);background:rgba(201,146,42,.04)}
+.lr-drop:hover{border-color:var(--gold-500);background:var(--gold-wash);color:var(--text-secondary)}
+.lr-drop .di{color:var(--gold-400);margin-bottom:8px;display:flex;justify-content:center}
+.lr-drop .dt{font-size:13.5px}
+.lr-drop .dh{font-size:11.5px;margin-top:4px;color:var(--text-tertiary)}
+.lr-thumbs{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}
+.lr-thumbs .th{position:relative;width:62px;height:62px;border-radius:8px;overflow:hidden;border:1px solid var(--soft)}
+.lr-thumbs .th img{width:100%;height:100%;object-fit:cover}
+.lr-thumbs .th button{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(6,15,28,.85);color:#fff;font-size:12px;line-height:1;display:grid;place-items:center}
+
+/* ============ Custom cursor ============ */
+@media (hover:hover) and (pointer:fine){
+  body.lr-cursor, body.lr-cursor *{cursor:none !important}
+  #lr-cur{position:fixed;top:0;left:0;width:9px;height:9px;border-radius:50%;background:var(--gold-400);
+    z-index:9999;pointer-events:none;transform:translate(-50%,-50%);transition:width .25s var(--ease-out),height .25s var(--ease-out),background .25s,opacity .3s;mix-blend-mode:screen}
+  #lr-ring{position:fixed;top:0;left:0;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(201,146,42,.55);
+    z-index:9998;pointer-events:none;transform:translate(-50%,-50%);transition:width .28s var(--ease-out),height .28s var(--ease-out),border-color .28s,opacity .3s,background .28s}
+  body.lr-down #lr-ring{width:26px;height:26px}
+  body.lr-hot #lr-ring{width:58px;height:58px;border-color:rgba(229,180,90,.9);background:rgba(201,146,42,.08)}
+  body.lr-hot #lr-cur{width:5px;height:5px}
+  #lr-cur.hide,#lr-ring.hide{opacity:0}
+}
+
+/* ============ Admin panel ============ */
+.admin-link{opacity:.5;font-size:12px}
+.admin-link:hover{opacity:1}
+#admin-scrim{position:fixed;inset:0;z-index:130;display:none;background:rgba(5,12,24,.92);backdrop-filter:blur(10px);
+  overflow-y:auto;padding:0}
+#admin-scrim.open{display:block}
+.admin-shell{min-height:100vh;max-width:1100px;margin:0 auto;padding:34px 40px 80px}
+.admin-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px;flex-wrap:wrap}
+.admin-top h2{font-family:var(--font-display);font-size:30px;font-weight:700;line-height:1.1;white-space:nowrap}
+.admin-top .eyebrow{display:block;margin-bottom:8px}
+.admin-sub{color:var(--text-tertiary);font-size:14px;margin-bottom:30px;max-width:62ch;line-height:1.7}
+.admin-gate{max-width:380px;margin:14vh auto 0;text-align:center}
+.admin-gate .lock{width:62px;height:62px;border-radius:50%;margin:0 auto 22px;display:grid;place-items:center;
+  background:var(--gold-wash);border:1px solid var(--soft);color:var(--gold-400)}
+.admin-gate h2{font-family:var(--font-display);font-size:26px;margin-bottom:10px}
+.admin-gate p{color:var(--text-tertiary);font-size:14px;margin-bottom:22px;line-height:1.7}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.admin-card{background:var(--glass);border:1px solid var(--hairline);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.admin-card .ph{aspect-ratio:16/9;background:linear-gradient(150deg,var(--navy-400),var(--navy-700));position:relative;overflow:hidden}
+.admin-card .ph img{width:100%;height:100%;object-fit:cover}
+.admin-card .st{position:absolute;top:10px;right:10px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;
+  padding:4px 10px;border-radius:20px;background:rgba(26,122,74,.85);color:#fff}
+.admin-card .st.rented{background:rgba(192,57,43,.85)}
+.admin-card .ab{padding:16px 18px;flex:1;display:flex;flex-direction:column;gap:4px}
+.admin-card .ab .pr{font-family:var(--font-display);color:var(--gold-400);font-size:20px;font-weight:700}
+.admin-card .ab .tt{font-weight:600;font-size:14.5px}
+.admin-card .ab .ad{font-size:12.5px;color:var(--text-tertiary)}
+.admin-card .acts{display:flex;gap:8px;padding:0 18px 16px}
+.admin-card .acts .btn{flex:1;justify-content:center;padding:9px 12px;font-size:12.5px}
+.btn-danger{background:rgba(192,57,43,.16);border:1px solid rgba(252,129,129,.4);color:var(--red-300)}
+.btn-danger:hover{background:rgba(192,57,43,.3);transform:translateY(-2px)}
+.admin-empty{grid-column:1/-1;text-align:center;padding:50px;color:var(--text-tertiary);border:1px dashed var(--soft);border-radius:12px}
+@media(max-width:760px){.admin-grid{grid-template-columns:1fr}.admin-shell{padding:26px 22px 60px}}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#top" class="brand"><img src="assets/logo-light.png" alt="LondonRental.ca — Rentals Made Simple" /></a>
+  <div class="nav-links" id="navLinks">
+    <a href="#listings">Rentals</a>
+    <a href="#landlords">For Landlords</a>
+    <a href="#about">About</a>
+    <a href="#contact" class="btn btn-gold" data-landlord>List Your Property <span class="arr">→</span></a>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</nav>
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<!-- ============ HERO ============ -->
+<header id="top" class="hero-scene">
+  <div id="hero-media">
+    <div class="hm-bg" id="hm-bg" style="background-image:url('assets/hero-night.jpg')"></div>
+    <div class="hm-grade"></div>
+    <div class="hm-bloom"></div>
+  </div>
+  <div id="canvas-veil"></div>
+  <div class="hero-sticky hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">
+        <span class="line"></span>
+        <span class="eyebrow">London, Ontario — One City, Done Right</span>
+      </div>
+      <h1>Rentals<br /><span class="it">Made Simple.</span></h1>
+      <p class="sub">London's dedicated rental marketplace. We promote your property, handle every inquiry, and coordinate showings — so you stay in control of the lease and the keys.</p>
+      <div class="cta-row">
+        <a href="#contact" class="btn btn-gold" data-landlord>List Your Property <span class="arr">→</span></a>
+        <a href="#listings" class="btn btn-outline">Browse Rentals <span class="arr">→</span></a>
+      </div>
+    </div>
+    <div class="scroll-cue">
+      <div class="mouse"></div>
+      <span>Scroll</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ STAT BAND ============ -->
+<section class="stat-band">
+  <div class="wrap">
+    <div class="stat-grid">
+      <div class="stat reveal"><div class="num" data-count="40" data-suffix="%">40%</div><div class="lbl">One-Time Fee · No Monthly Cut</div></div>
+      <div class="stat reveal"><div class="num" data-count="20" data-suffix="K+">20K+</div><div class="lbl">Student Housing Network</div></div>
+      <div class="stat reveal"><div class="num">$0</div><div class="lbl">Upfront Cost to Landlords</div></div>
+      <div class="stat reveal"><div class="num" data-count="4" data-suffix="+ yrs">4+ yrs</div><div class="lbl">Leasing the London Market</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LANDLORDS ============ -->
+<section id="landlords" class="section pad grid-tex">
+  <div class="wrap split">
+    <div>
+      <span class="eyebrow reveal">For Landlords</span>
+      <h2 class="title reveal" style="margin-top:18px">We do the legwork.<br /><span class="gold-text">You keep control.</span></h2>
+      <p class="lead reveal" style="margin-top:22px">List with a dedicated local agent who lives and breathes the London market. We market your property everywhere renters look, screen the noise, and bring you ready tenants — while every legal decision stays in your hands.</p>
+      <div class="control-list">
+        <div class="control-item reveal">
+          <div class="ic"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l8-7 8 7"/><path d="M5 9v9h10V9"/></svg></div>
+          <div><h4>You sign every lease</h4><p>We coordinate and collect the documents — you review and sign. Nothing is committed without you.</p></div>
+        </div>
+        <div class="control-item reveal">
+          <div class="ic"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="9" rx="1.5"/><path d="M3 9h14"/></svg></div>
+          <div><h4>You collect the rent</h4><p>Rent flows directly to you, every month. We never touch your cash flow or hold deposits.</p></div>
+        </div>
+        <div class="control-item reveal">
+          <div class="ic"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3.2"/><path d="M4 17c0-3.3 2.7-5 6-5s6 1.7 6 5"/></svg></div>
+          <div><h4>We handle the inquiries</h4><p>Hundreds of messages across Kijiji, Facebook and student groups — filtered, answered, and scheduled by us.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="split-visual reveal">
+      <img src="assets/aerial-neighbourhood.jpg" alt="Aerial view of a London, Ontario residential neighbourhood" loading="lazy" />
+      <div class="scrim"></div>
+      <div class="badge-float">
+        <div class="k">Zero financial risk</div>
+        <div class="v">No money upfront. You only pay once a qualified tenant signs — for your complete peace of mind.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section id="services" class="section services pad grid-tex">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow reveal">What's Included</span>
+      <h2 class="title reveal" style="margin-top:14px">Everything, handled.</h2>
+      <p class="lead reveal">One flat service covers the entire process — from the first photo to the signed lease. No add-ons, no monthly retainers.</p>
+    </div>
+    <div class="svc-grid">
+      <div class="svc-card reveal"><div class="ic"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l16-6-3 16-4-6-9-4z"/></svg></div><h4>Multi-Channel Promotion</h4><p>Kijiji, Facebook Marketplace and student housing groups 20,000+ strong — wherever London renters look.</p></div>
+      <div class="svc-card reveal"><div class="ic"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></div><h4>Showing Coordination</h4><p>We schedule and run viewings around your availability — individual or group tours, your call.</p></div>
+      <div class="svc-card reveal"><div class="ic"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h9l3 3v13H4z"/><path d="M13 4v3h3M7 12h6M7 15h6"/></svg></div><h4>Document Collection</h4><p>Applications, references and credit checks gathered and organised, ready for your review.</p></div>
+      <div class="svc-card reveal"><div class="ic"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h4>Tenant Screening</h4><p>We vet every applicant — income, references, history — so only serious tenants reach your desk.</p></div>
+      <div class="svc-card reveal"><div class="ic"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h4>Fast Turnaround</h4><p>Empty units cost money. Our local network fills quality properties quickly, often within days.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEES ============ -->
+<!-- ============ LISTINGS ============ -->
+<section id="listings" class="section listings pad">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow reveal">Available Rentals</span>
+      <h2 class="title reveal" style="margin-top:14px">Now leasing across London.</h2>
+      <p class="lead reveal">A snapshot of current and recent listings — from downtown lofts to student houses near Western and Fanshawe.</p>
+    </div>
+    <div class="filter-row reveal" id="filters">
+      <button class="chip active" data-filter="All">All Rentals</button>
+      <button class="chip" data-filter="House">House</button>
+      <button class="chip" data-filter="Apartment">Apartment</button>
+      <button class="chip" data-filter="Condo">Condo</button>
+      <button class="chip" data-filter="Townhome">Townhome</button>
+      <button class="chip" data-filter="Private Room">Private Rooms</button>
+      <button class="chip" data-filter="Basement">Basements</button>
+    </div>
+    <div class="list-grid" id="list-grid"></div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" class="section about pad">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="kunal-photo reveal">
+        <img src="assets/kunal.jpeg" alt="Kunal Singh Thakur, residential leasing agent in London, Ontario" loading="lazy" />
+        <div class="kp-scrim"></div>
+        <div class="kp-name">
+          <div class="name">Kunal Singh Thakur</div>
+          <div class="role">Residential Leasing Agent · 4+ Years in London</div>
+        </div>
+      </div>
+      <div class="about-copy">
+        <span class="eyebrow reveal">The Local Difference</span>
+        <blockquote class="reveal" style="margin-top:20px"><span class="mark">"</span>I focus on one city — London, Ontario — and nothing else. That's how I know every neighbourhood, the student rush, and exactly where your tenants are looking.<span class="mark">"</span></blockquote>
+        <p class="by reveal">Most platforms spread thin across the province. LondonRental.ca is built around a single market and a single, hands-on agent — so landlords get a real person who answers, and tenants get listings they can trust.</p>
+        <div class="about-sign reveal">
+          <span class="sig">Kunal Singh Thakur</span>
+          <span class="sig-sub">Founder · LondonRental.ca</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section id="contact" class="section cta pad">
+  <div class="wrap">
+    <span class="eyebrow reveal">Ready When You Are</span>
+    <h2 class="reveal" style="margin-top:18px">List your property.<br /><span class="gold-text">Keep your peace of mind.</span></h2>
+    <p class="lead reveal">No money upfront, no monthly cut, no long-term lock-in. Just dedicated local service from someone who knows London inside out.</p>
+    <div class="cta-row reveal">
+      <a href="#contact" class="btn btn-gold" data-landlord>Submit My Property <span class="arr">→</span></a>
+      <a href="#listings" class="btn btn-ghost">I'm Looking to Rent <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <img class="flogo" src="assets/logo-light.png" alt="LondonRental.ca" />
+        <p class="fdesc">London, Ontario's dedicated rental marketplace. Promotion, inquiries, showings and documents — handled. You keep control of the lease and the rent.</p>
+      </div>
+      <div>
+        <h5>Explore</h5>
+        <ul>
+          <li><a href="#listings">Available Rentals</a></li>
+          <li><a href="#landlords">For Landlords</a></li>
+          <li><a href="#services">What's Included</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#about">About Kunal</a></li>
+          <li><a href="#contact" data-landlord>List a Property</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Get in Touch</h5>
+        <ul>
+          <li><a href="mailto:info@londonrental.ca">info@londonrental.ca</a></li>
+          <li><a href="#">London, Ontario, Canada</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 LondonRental.ca · Rentals Made Simple</span>
+      <span class="foot-end">One city, done right.
+        <button class="admin-dot" id="admin-open" aria-label="Admin access" title="Admin access"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="app.js"></script>
+<script src="fx.js"></script>
+<script src="modals.js"></script>
+<script src="admin.js"></script>
+
+</body>
+</html>
