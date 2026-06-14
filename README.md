@@ -1,6 +1,12 @@
-# LondonRental.ca
+<p align="center">
+  <img src="assets/logo-gold.png" alt="LondonRental.ca" width="280" />
+</p>
 
-**Live:** [https://londonrental.ca](https://londonrental.ca)
+<h1 align="center">LondonRental.ca</h1>
+
+<p align="center">
+  <strong>🔗 Live:</strong> <a href="https://londonrental.ca">https://londonrental.ca</a>
+</p>
 
 A rental listing platform for a property management business in London, Ontario. The owner manages all listings through a browser-based admin panel — no database server, no developer needed for day-to-day operations.
 
@@ -21,35 +27,52 @@ A traditional stack (React + Express + PostgreSQL) would have required a VPS, a 
 
 ## Architecture
 
-```
-Browser (Visitor)                    Browser (Admin)
-       │                                    │
-       │  GET /api/listings.php             │  POST /api/listings.php
-       │  (fetch listings as JSON)          │  POST /api/upload.php
-       ▼                                    │  POST /api/login.php
-┌──────────────┐                            ▼
-│              │                     ┌──────────────┐
-│  index.html  │◄───── renders ──── │   admin.js    │
-│  app.js      │                    │  (CRUD editor │
-│  modals.js   │                    │   in-browser) │
-│  fx.js       │                    └──────┬───────┘
-│              │                           │
-└──────────────┘                           │ JSON over HTTPS
-                                           ▼
-                                    ┌──────────────┐
-                                    │  PHP API      │
-                                    │  _bootstrap   │
-                                    │  login.php    │
-                                    │  listings.php │
-                                    │  upload.php   │
-                                    └──────┬───────┘
-                                           │
-                              ┌────────────┼────────────┐
-                              ▼            ▼            ▼
-                        data/          uploads/     $_SESSION
-                        listings.json  listings/    (server-side
-                        (all listing   (uploaded     cookie auth)
-                         data)          photos)
+```mermaid
+flowchart TB
+    subgraph Clients ["🌐 Browser Clients"]
+        V["👤 Visitor<br/><small>index.html · app.js · modals.js · fx.js</small>"]
+        A["🔐 Admin<br/><small>admin.js — CRUD Editor</small>"]
+    end
+
+    subgraph API ["⚙️ PHP REST API"]
+        LOGIN["login.php<br/><small>Session auth</small>"]
+        LISTINGS["listings.php<br/><small>GET: read · POST: save</small>"]
+        UPLOAD["upload.php<br/><small>Validate + save images</small>"]
+        BOOT["_bootstrap.php<br/><small>CORS · JSON helpers · CSRF guard</small>"]
+    end
+
+    subgraph Storage ["💾 File-Based Storage"]
+        JSON["📄 data/listings.json<br/><small>All listing data · LOCK_EX writes</small>"]
+        PHOTOS["🖼️ uploads/listings/<br/><small>Uploaded photos · .htaccess protected</small>"]
+        SESSION["🍪 $_SESSION<br/><small>Server-side cookie auth</small>"]
+    end
+
+    V -- "GET /api/listings.php<br/><small>Fetch listings as JSON</small>" --> LISTINGS
+    V -- "GET ?meta=1<br/><small>Poll every 10s for changes</small>" --> LISTINGS
+    A -- "POST /api/login.php<br/><small>Password + session</small>" --> LOGIN
+    A -- "POST /api/listings.php<br/><small>Save full listings array</small>" --> LISTINGS
+    A -- "POST /api/upload.php<br/><small>Base64 image data</small>" --> UPLOAD
+
+    LOGIN --> SESSION
+    LISTINGS -- "file_get_contents()<br/>file_put_contents()" --> JSON
+    UPLOAD -- "getimagesizefromstring()<br/>random filename" --> PHOTOS
+
+    BOOT -. "shared by all endpoints" .-> LOGIN
+    BOOT -. "shared by all endpoints" .-> LISTINGS
+    BOOT -. "shared by all endpoints" .-> UPLOAD
+
+    style Clients fill:#0d1b2a,stroke:#C9922A,color:#f0f0f0
+    style API fill:#1b2838,stroke:#5B8DEE,color:#f0f0f0
+    style Storage fill:#112233,stroke:#1ABC9C,color:#f0f0f0
+    style V fill:#162a44,stroke:#C9922A,color:#f0f0f0
+    style A fill:#162a44,stroke:#C9922A,color:#f0f0f0
+    style LOGIN fill:#1a3050,stroke:#5B8DEE,color:#f0f0f0
+    style LISTINGS fill:#1a3050,stroke:#5B8DEE,color:#f0f0f0
+    style UPLOAD fill:#1a3050,stroke:#5B8DEE,color:#f0f0f0
+    style BOOT fill:#1a3050,stroke:#5B8DEE,color:#f0f0f0,stroke-dasharray: 5 5
+    style JSON fill:#0f2030,stroke:#1ABC9C,color:#f0f0f0
+    style PHOTOS fill:#0f2030,stroke:#1ABC9C,color:#f0f0f0
+    style SESSION fill:#0f2030,stroke:#1ABC9C,color:#f0f0f0
 ```
 
 ### Data Flow
