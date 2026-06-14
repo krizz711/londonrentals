@@ -10,7 +10,7 @@ The business owner needed a premium, high-performing rental listing platform but
 
 ## 💡 The Solution: A Database-less Architecture
 
-We built a state-of-the-art solution that entirely eliminates the need for a traditional database, saving time, reducing server overhead, and making deployment incredibly easy:
+We built a solution that entirely eliminates the need for a traditional database, saving time, reducing server overhead, and making deployment incredibly easy:
 
 1. **Intuitive Admin Panel**: The owner can log in to a secure admin portal to Add, Edit, and Delete rental listings. It supports uploading photos, adding descriptions, setting prices, and toggling availability.
 2. **Flat-File JSON Storage via PHP APIs**: Instead of a complex database, the listings are managed via custom **PHP REST APIs** that securely read and write data to a lightweight `listings.json` file.
