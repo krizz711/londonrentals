@@ -2,8 +2,6 @@
   <img src="assets/logo-gold.png" alt="LondonRental.ca" width="280" />
 </p>
 
-<h1 align="center">LondonRental.ca</h1>
-
 <p align="center">
   <strong>🔗 Live:</strong> <a href="https://londonrental.ca">https://londonrental.ca</a>
 </p>
