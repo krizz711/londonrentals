@@ -25,20 +25,131 @@
     return l.slice().sort((a, b) => (a.status === 'Rented' ? 1 : 0) - (b.status === 'Rented' ? 1 : 0));
   }
 
-  /* ---------- store ---------- */
-  function load() {
-    try { const raw = localStorage.getItem(STORE_KEY); if (raw) return sortList(JSON.parse(raw)); } catch (e) {}
-    return sortList(DEFAULTS.map((d) => Object.assign({}, d)));
+  /* ---------- store ----------
+     Listings are saved on the server (api/listings.php) so they are
+     SHARED by every visitor. When the admin changes one, all open
+     browsers pick it up within a few seconds (polling, below).
+     If the server/API isn't reachable (opened as a local file, or a
+     host without PHP) we fall back to localStorage so the site still
+     works on its own. */
+  const API = 'api/';
+  let serverMode = false;   // true once the server API answers
+  let version = null;       // server data version (changes when listings change)
+  let cache = null;         // listings held in memory (null = not loaded yet)
+
+  function lsLoad() {
+    try { const raw = localStorage.getItem(STORE_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+    return DEFAULTS.map((d) => Object.assign({}, d));
   }
-  function save(list) { try { localStorage.setItem(STORE_KEY, JSON.stringify(sortList(list))); } catch (e) {} }
+  function lsSave(list) { try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); } catch (e) {} }
+
+  /* what the public grid shows: loaded data, or the sample set as a fallback */
+  function currentList() { return (cache && cache.length) ? cache : DEFAULTS.map((d) => Object.assign({}, d)); }
+
+  async function apiGet(path) {
+    const sep = path.includes('?') ? '&' : '?';
+    const r = await fetch(API + path + sep + 't=' + Date.now(), { credentials: 'same-origin', cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }
+  async function apiPost(path, body) {
+    const r = await fetch(API + path, {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'fetch' },
+      body: JSON.stringify(body),
+    });
+    let data = {}; try { data = await r.json(); } catch (e) {}
+    return { ok: r.ok && data && data.ok !== false, data: data };
+  }
+
+  function adminError() {
+    alert('Could not save. Please open the admin panel and sign in again, and check your internet connection.');
+  }
+
+  /* persist the whole list to the server (or localStorage when offline) */
+  async function persist(list) {
+    if (serverMode) {
+      const res = await apiPost('listings.php', { action: 'save', listings: list });
+      if (!res.ok) { adminError(); await Store.refresh(); return; }
+      if (res.data && res.data.version != null) version = res.data.version;
+    } else {
+      lsSave(list);
+    }
+  }
 
   const Store = {
-    all() { return load(); },
-    add(item) { const l = load(); l.unshift(item); save(l); render(); },
-    update(i, item) { const l = load(); l[i] = item; save(l); render(); },
-    remove(i) { const l = load(); l.splice(i, 1); save(l); render(); },
-    reset() { save(DEFAULTS.map((d) => Object.assign({}, d))); render(); },
+    all() { return sortList(currentList()); },
+
+    async refresh() {
+      try {
+        const res = await apiGet('listings.php');           // { version, listings }
+        serverMode = true;
+        version = res.version;
+        cache = Array.isArray(res.listings) ? res.listings : [];
+      } catch (e) {
+        serverMode = false;                                  // no server → local fallback
+        cache = lsLoad();
+      }
+      render();
+    },
+
+    async init() {
+      render();                 // paint samples immediately so there is no blank flash
+      await this.refresh();     // then load the real, shared data
+      if (serverMode) {
+        setInterval(async () => {                            // near-real-time: poll for changes
+          try {
+            const meta = await apiGet('listings.php?meta=1');   // { version }
+            if (meta && meta.version !== version) await this.refresh();
+          } catch (e) {}
+        }, 10000);
+      }
+    },
+
+    /* upload a photo (data URL) to the server, return its public URL.
+       Keeps the image inline when offline so local editing still works. */
+    async uploadImage(dataUrl) {
+      if (!dataUrl || dataUrl.indexOf('data:') !== 0) return dataUrl;   // already a URL, or empty
+      if (!serverMode) return dataUrl;                                   // local mode: keep inline
+      try {
+        const res = await apiPost('upload.php', { image: dataUrl });
+        if (res.ok && res.data && res.data.url) return res.data.url;
+      } catch (e) {}
+      return dataUrl;
+    },
+
+    async add(item) {
+      cache = [Object.assign({}, item), ...currentList()];   // optimistic
+      render();
+      await persist(cache);
+    },
+    async update(i, item) {
+      cache = currentList().slice(); cache[i] = Object.assign({}, item);   // optimistic
+      render();
+      await persist(cache);
+    },
+    async remove(i) {
+      cache = currentList().slice(); cache.splice(i, 1);   // optimistic
+      render();
+      await persist(cache);
+    },
+    async reset() {
+      cache = DEFAULTS.map((d) => Object.assign({}, d));   // optimistic
+      render();
+      await persist(cache);
+    },
+
     typeColor: TYPE_COLOR,
+
+    /* Return all media items for a listing as [{type:'image'|'video', src:…}, …] */
+    getMedia: function (l) {
+      var media = [];
+      var imgs = Array.isArray(l.images) ? l.images : [];
+      if (!imgs.length && l.img) imgs = [l.img];
+      imgs.forEach(function (u) { if (u) media.push({ type: 'image', src: u }); });
+      if (l.video) media.push({ type: 'video', src: l.video });
+      return media;
+    },
   };
   window.LR_Store = Store;
 
@@ -56,13 +167,21 @@
     const dot = TYPE_COLOR[l.type] || '#C9922A';
     const rented = l.status === 'Rented';
     const fallback = 'linear-gradient(150deg,#112847,#091520)';
+    const media = Store.getMedia(l);
+    const firstImg = media.find(function (m) { return m.type === 'image'; });
+    const thumbSrc = firstImg ? firstImg.src : (media.length ? '' : '');
+    const hasVideo = media.some(function (m) { return m.type === 'video'; });
+    const mediaCount = media.length;
     return '' +
       '<article class="listing" data-type="' + l.type + '">' +
         '<div class="ph">' +
-          '<img src="' + l.img + '" alt="' + l.title + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.style.background=\'' + fallback + '\'" />' +
+          (thumbSrc
+            ? '<img src="' + thumbSrc + '" alt="' + l.title + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.style.background=\'' + fallback + '\'" />'
+            : (hasVideo ? '<video src="' + media[0].src + '" muted preload="metadata" style="width:100%;height:100%;object-fit:cover"></video>' : '')) +
           '<div class="scrim"></div>' +
           '<div class="type-pill"><span class="dot" style="background:' + dot + '"></span>' + l.type + '</div>' +
           '<div class="status-pill ' + (rented ? 'rented' : '') + '">' + l.status + '</div>' +
+          (mediaCount > 1 ? '<span style="position:absolute;bottom:10px;right:10px;background:rgba(8,18,32,.7);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.13);border-radius:14px;padding:3px 10px;font-size:10px;color:rgba(255,255,255,.7);font-weight:600;z-index:2">' + mediaCount + ' media</span>' : '') +
         '</div>' +
         '<div class="body">' +
           '<div class="price">$' + Number(l.price).toLocaleString() + '<span> /mo</span></div>' +
@@ -182,5 +301,5 @@
     requestAnimationFrame(tick);
   };
 
-  render();
+  Store.init();
 })();

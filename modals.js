@@ -68,7 +68,6 @@
      ========================================================= */
   const STEPS = ['Our Services', "What's Included", 'Our Fees', 'Submit Property'];
   let llStep = 1;
-  let llPhotos = [];
   const llForm = { address: '', postal: '', type: 'House', beds: '', baths: '', rent: '', parking: 'No', description: '', name: '', phone: '', email: '' };
 
   function stepBar(current) {
@@ -133,13 +132,6 @@
         '<div><label>Parking</label><select id="f-parking">' + opts(['No', 'Yes', 'Street'], llForm.parking) + '</select></div>' +
         '</div>';
       h += '<div class="lr-field"><label>Property Description</label><textarea id="f-description" placeholder="Describe your property…">' + esc(llForm.description) + '</textarea></div>';
-      h += '<div class="lr-field"><label>Property Photos</label>' +
-        '<div class="lr-drop" onclick="document.getElementById(\'f-photos\').click()">' +
-          '<div class="di">' + svg('camera', 26) + '</div>' +
-          '<div class="dt">Click to add photos of your property</div>' +
-          '<div class="dh">JPG or PNG — add as many as you like</div></div>' +
-        '<input id="f-photos" type="file" accept="image/*" multiple style="display:none" onchange="LR_llPhotoAdd(this)">' +
-        '<div class="lr-thumbs" id="lr-thumbs"></div></div>';
       h += '<div class="lr-sub-label" style="margin-top:8px">Your Contact Details</div>';
       h += '<div class="lr-field"><label>Full Name *</label><input id="f-name" placeholder="Your full name" value="' + esc(llForm.name) + '"></div>';
       h += '<div class="lr-grid2">' +
@@ -152,27 +144,7 @@
       h += '</div>';
     }
     el.innerHTML = h;
-    if (llStep === 4) renderThumbs();
   }
-
-  function renderThumbs() {
-    const wrap = document.getElementById('lr-thumbs');
-    if (!wrap) return;
-    wrap.innerHTML = llPhotos.map((p, i) =>
-      '<div class="th"><img src="' + p.url + '" alt=""><button type="button" onclick="LR_llPhotoDel(' + i + ')" aria-label="Remove">×</button></div>'
-    ).join('');
-  }
-  window.LR_llPhotoAdd = function (input) {
-    const files = Array.from(input.files || []);
-    files.forEach((f) => {
-      if (!f.type.startsWith('image/')) return;
-      const r = new FileReader();
-      r.onload = () => { llPhotos.push({ name: f.name, url: r.result }); renderThumbs(); };
-      r.readAsDataURL(f);
-    });
-    input.value = '';
-  };
-  window.LR_llPhotoDel = function (i) { llPhotos.splice(i, 1); renderThumbs(); };
 
   function opts(arr, sel, ph) {
     return arr.map((o) => {
@@ -198,6 +170,10 @@
     }
     const lines = [
       'NEW PROPERTY LISTING — LondonRental.ca', '',
+      '=========================================',
+      '>>  ATTACH YOUR PROPERTY PHOTOS HERE  <<',
+      '    (add the photo files to this email before you send it)',
+      '=========================================', '',
       'PROPERTY DETAILS',
       'Street Address: ' + llForm.address,
       'Postal Code: ' + (llForm.postal || '—'),
@@ -206,8 +182,7 @@
       'Bathrooms: ' + (llForm.baths || '—'),
       'Monthly Rent: $' + (llForm.rent || '—'),
       'Parking: ' + llForm.parking,
-      'Description: ' + (llForm.description || '—'),
-      'Photos: ' + (llPhotos.length ? llPhotos.length + ' photo(s) selected — please attach them to this email before sending' : 'none selected'), '',
+      'Description: ' + (llForm.description || '—'), '',
       'CONTACT',
       'Name: ' + llForm.name,
       'Phone: ' + (llForm.phone || '—'),
@@ -220,13 +195,14 @@
   function llConfirm() {
     body().innerHTML = '<div class="lr-done"><div class="ring">' + svg('check', 34) + '</div>' +
       '<h3>Property Submitted!</h3>' +
-      '<p>Your details have been prepared as an email to <strong>' + TO + '</strong>.<br>Just hit send in your mail app — we\'ll get back to you within 24 hours.</p>' +
+      '<p>Your details have been prepared as an email to <strong>' + TO + '</strong>.</p>' +
+      '<p style="font-weight:700;font-size:15px;color:#C9922A;margin:8px 0 4px">📎 Attach your property photos to that email before you hit send.</p>' +
+      '<p style="font-size:13px">Then just hit send in your mail app — we\'ll get back to you within 24 hours.</p>' +
       '<button class="btn btn-gold" style="margin:0 auto" onclick="LR_close()">Done <span class="arr">→</span></button></div>';
   }
 
   window.LR_openLandlord = function () {
     llStep = 1;
-    llPhotos = [];
     dialog.innerHTML = shell('For Landlords', 'Welcome to LondonRental.ca');
     openScrim();
     renderLandlord();
@@ -324,15 +300,68 @@
     return '<span class="lr-d-chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + DI[icon] + '</svg>' + label + '</span>';
   }
 
+  let activeMediaIndex = 0;
+  let detailMedia = [];
+  
+  window.LR_galleryGo = function(idx) {
+    if (!detailMedia.length) return;
+    activeMediaIndex = (idx + detailMedia.length) % detailMedia.length;
+    const g = dialog.querySelector('.lr-d-gallery');
+    if (!g) return;
+    g.querySelectorAll('video').forEach(v => { v.pause(); v.classList.remove('active'); });
+    g.querySelectorAll('img').forEach(i => i.classList.remove('active'));
+    g.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+    
+    const m = detailMedia[activeMediaIndex];
+    if (m.type === 'video') {
+      const v = document.getElementById('g-vid-' + activeMediaIndex);
+      if (v) { v.classList.add('active'); v.play().catch(e=>{}); }
+    } else {
+      const i = document.getElementById('g-img-' + activeMediaIndex);
+      if (i) i.classList.add('active');
+    }
+    const c = document.getElementById('g-count');
+    if (c) c.textContent = activeMediaIndex + 1;
+    const dots = g.querySelectorAll('.dot');
+    if (dots[activeMediaIndex]) dots[activeMediaIndex].classList.add('active');
+  };
+  window.LR_galleryNav = function(dir) { LR_galleryGo(activeMediaIndex + dir); };
+
   window.LR_openDetail = function (l) {
     const rented = l.status === 'Rented';
     const dot = TYPE_COLOR[l.type] || '#C9922A';
     const beds = l.beds === 0 ? 'Studio' : l.beds + ' Bed' + (l.beds > 1 ? 's' : '');
     const mapQ = encodeURIComponent(l.addr + ', London, Ontario, Canada');
+    detailMedia = window.LR_Store ? LR_Store.getMedia(l) : [];
+    activeMediaIndex = 0;
+    
+    let galleryHtml = '<div class="lr-d-gallery" style="background:var(--navy-600)"></div>';
+    if (detailMedia.length > 0) {
+      galleryHtml = '<div class="lr-d-gallery">';
+      detailMedia.forEach((m, i) => {
+        if (m.type === 'video') {
+          galleryHtml += '<video id="g-vid-' + i + '" src="' + esc(m.src) + '" class="' + (i === 0 ? 'active' : '') + '" controls muted playsinline></video>';
+        } else {
+          galleryHtml += '<img id="g-img-' + i + '" src="' + esc(m.src) + '" class="' + (i === 0 ? 'active' : '') + '" alt="" onerror="this.style.display=\'none\'">';
+        }
+      });
+      if (detailMedia.length > 1) {
+        galleryHtml += '<button class="lr-d-nav prev" onclick="LR_galleryNav(-1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>';
+        galleryHtml += '<button class="lr-d-nav next" onclick="LR_galleryNav(1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>';
+        galleryHtml += '<div class="lr-d-counter"><span id="g-count">1</span> / ' + detailMedia.length + '</div>';
+        galleryHtml += '<div class="lr-d-dots">';
+        detailMedia.forEach((m, i) => {
+          galleryHtml += '<button class="dot ' + (i === 0 ? 'active' : '') + '" onclick="LR_galleryGo(' + i + ')"></button>';
+        });
+        galleryHtml += '</div>';
+      }
+      galleryHtml += '</div>';
+    }
+
     dialog.className = 'lr-dialog wide';
     dialog.innerHTML =
       '<button class="lr-close" aria-label="Close" onclick="LR_close()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
-      '<div class="lr-d-hero"><img src="' + esc(l.img) + '" alt="' + esc(l.title) + '" onerror="this.style.display=\'none\'">' +
+      '<div class="lr-d-hero">' + galleryHtml +
         '<div class="lr-d-pills"><span class="lr-d-type"><span class="dot" style="background:' + dot + '"></span>' + esc(l.type) + '</span>' +
         '<span class="lr-d-status ' + (rented ? 'rented' : '') + '">' + esc(l.status) + '</span></div>' +
         '<div class="lr-d-price">$' + Number(l.price).toLocaleString() + '<span> /mo</span></div></div>' +

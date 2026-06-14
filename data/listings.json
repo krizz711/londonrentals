@@ -1,0 +1,64 @@
+[
+    {
+        "type": "Condo",
+        "status": "Available",
+        "title": "Riverside 2-Bed Condo",
+        "hood": "Masonville",
+        "addr": "330 Oxford St E",
+        "price": 2100,
+        "beds": 2,
+        "baths": 2,
+        "parking": 1,
+        "pets": false,
+        "images": [
+            "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+            "uploads/listings/ldf442cb7dc3cabd8.jpg",
+            "uploads/listings/le59ab7a415e6a5c2.jpg",
+            "uploads/listings/l5de08691a155b013.jpg"
+        ],
+        "img": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+        "video": ""
+    },
+    {
+        "type": "House",
+        "price": 2750,
+        "status": "Available",
+        "title": "Family Home with Yard",
+        "hood": "Wortley Village",
+        "addr": "18 Bruce St",
+        "beds": 4,
+        "baths": 2,
+        "parking": 2,
+        "pets": true,
+        "desc": "A warm four-bedroom family home in beloved Wortley Village. Hardwood floors, a renovated kitchen, two full baths and a large fenced yard. Pet-friendly and walkable to the village shops.",
+        "img": "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "type": "Townhome",
+        "price": 2250,
+        "status": "Rented",
+        "title": "Hyde Park Townhome",
+        "hood": "Hyde Park",
+        "addr": "92 Gainsborough Rd",
+        "beds": 3,
+        "baths": 2,
+        "parking": 2,
+        "pets": true,
+        "desc": "A move-in-ready three-bedroom townhome in Hyde Park. Modern finishes, two baths, an attached garage and visitor parking. Minutes from big-box shopping and the 402.",
+        "img": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "type": "Apartment",
+        "price": 1550,
+        "status": "Available",
+        "title": "Cozy 1-Bed near Fanshawe",
+        "hood": "Whitehills",
+        "addr": "501 Huron St",
+        "beds": 1,
+        "baths": 1,
+        "parking": 1,
+        "pets": false,
+        "desc": "A cozy one-bedroom apartment a short ride from Fanshawe College. Clean, efficient layout, on-site laundry and one parking spot. Great first rental for a student or young professional.",
+        "img": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80"
+    }
+]
