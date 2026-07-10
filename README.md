@@ -2,9 +2,6 @@
   <img src="assets/logo-gold.png" alt="LondonRental.ca" width="280" />
 </p>
 
-<p align="center">
-  <strong>🔗 Live:</strong> <a href="https://londonrental.ca">https://londonrental.ca</a>
-</p>
 
 A rental listing platform for a property management business in London, Ontario. The owner manages all listings through a browser-based admin panel — no database server, no developer needed for day-to-day operations.
 
